@@ -10,8 +10,6 @@
     .swiper-pagination-bullet-active { background: black !important; }
     .product--information { height: fit-content; }
 </style>
-
-<p>{{ selected_variant.id }}</p>
 <div class="max-w-6xl mx-auto my-8">
     <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
         <div class="product--medias">
@@ -45,7 +43,6 @@
 
         <div class="product--information sticky top-5 p-2">
             {% form 'product', product %}
-                <input type="hidden" name="id" value="{{ selected_variant.id }}">
                 <div class="my-3">
                     <span class="text-xs text-gray-500">{{ product.vendor }}</span>
                 </div>
@@ -63,31 +60,26 @@
                     {% endif %}
                 </div>
 
+                <!-- Testing Div -->
+
                 <div class="my-3">
                     {% unless product.has_only_default_variant %}
-                        <div data-url="{{ product.url}}" data-section="{{ section.id }}">
-                            {% for option in product.options_with_values %}
-                                <label for="Option-{{ section.id }}-{{ forloop.index0 }}">{{ option.name }}</label>
-
-                                <div class="my-2">
-                                    <select 
-                                        name="options[{{ option.name | escape }}]" 
-                                        id="Option-{{ section.id }}-{{ forloop.index0 }}" 
-                                        class="w-full border py-3 px-3"
+                        <div data-url="{{ product.url }}" data-section="{{ section.id }}">
+                                <select name="id"
+                                id="Option-{{ section.id }}-{{ forloop.index0 }}" 
+                                class="w-full border py-3 px-3">
+                                {% for variant in product.variants %}
+                                    <option 
+                                    name="id"
+                                        value="{{ variant.id }}"
+                                        {% if variant.title == value %}
+                                            selected="selected"
+                                        {% endif %}
                                     >
-                                        {% for value in option.values %}
-                                            <option 
-                                                value="{{ value | escape }}"
-                                                {% if option.selected_value == value %}
-                                                    selected="selected"
-                                                {% endif %}
-                                            >
-                                                {{ value }}
-                                            </option>
-                                        {% endfor %}
-                                    </select>
-                                </div>
-                            {% endfor %}
+                                        {{ variant.title }}
+                                    </option>
+                                {% endfor %}
+                            </select>
                         </div>
                     {% endunless %}
                 </div>
@@ -126,7 +118,7 @@
 <script>
     const swiper = new Swiper('.swiper', {
         direction: 'horizontal',
-
+ 
         pagination: {
             el: '.swiper-pagination'
         },
@@ -137,3 +129,46 @@
         }
     })
 </script>
+
+{% schema %}
+{
+    "name": "Product",
+    "blocks": [
+        {
+            "type": "vendor",
+            "name": "Vendor",
+            "limit": 1 
+        },
+        {
+            "type": "title",
+            "name": "Title",
+            "limit": 1 
+        },
+        {
+            "type": "price",
+            "name": "Price",
+            "limit": 1 
+        },
+        {
+            "type": "variant_selector",
+            "name": "Variant Selector",
+            "limit": 1 
+        },
+        {
+            "type": "quantity",
+            "name": "Quantity",
+            "limit": 1 
+        },
+        {
+            "type": "description",
+            "name": "Description",
+            "limit": 1 
+        },
+        {
+            "type": "checkout_buttons",
+            "name": "Checkout Buttons",
+            "limit": 1 
+        }
+    ]
+}
+{% endschema %}
